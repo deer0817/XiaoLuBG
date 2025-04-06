@@ -106,7 +106,7 @@
             selectorNode.style.setProperty('--xiaolu-bg-img', `url(${bgImg})`);
         }
         _setBgImgInterval() {
-            let imgDuration = this._setting.imgDuration || 0;
+            let imgDuration = this._setting.imgDuration || 60;
             let selectorNode = this._getSelectorNode();
             if (imgDuration <= 0) {
                 return;
