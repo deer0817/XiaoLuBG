@@ -139,12 +139,12 @@
         opacity: 1,
         blur: 0,
         imgs: [
-            "./imgs/bridge.jpg",
-            "./imgs/chicago.jpg",
-            "./imgs/dusk.jpg",
-            "./imgs/kafka.jpg",
-            "./imgs/landscape.jpg",
-            "./imgs/moon.jpg"
+            "https://cdn.jsdelivr.net/gh/deer0817/XiaoLuBG/imgs/bridge.jpg",
+            "https://cdn.jsdelivr.net/gh/deer0817/XiaoLuBG/imgs/chicago.jpg",
+            "https://cdn.jsdelivr.net/gh/deer0817/XiaoLuBG/imgs/dusk.jpg",
+            "https://cdn.jsdelivr.net/gh/deer0817/XiaoLuBG/imgs/kafka.jpg",
+            "https://cdn.jsdelivr.net/gh/deer0817/XiaoLuBG/imgs/landscape.jpg",
+            "https://cdn.jsdelivr.net/gh/deer0817/XiaoLuBG/imgs/moon.jpg"
         ],
         imgMode: 0,
         imgDuration: 60,
