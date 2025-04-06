@@ -39,8 +39,8 @@ window.$BGIMG.set({
 
 // Create a new instance
 let bgDemo = new XiaoLuBG({
-    selector: "#background-demo",
-    position: "absolute",
+    selector: "#background-demo", // default: body, if it's not 'body', its position must be relative
+    position: "absolute", // default: fixed, must be absolute if selector is not 'body'
     imgMode: 0,
     blur: 1, // default: 0
     opacity: 0.9, // default: 1
