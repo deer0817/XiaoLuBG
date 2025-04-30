@@ -1,4 +1,16 @@
 (function(window){
+    const message = function() {
+/*
+
+██╗  ██╗██╗ █████╗  ██████╗ ██╗     ██╗   ██╗███████╗██████╗  ██████╗ 
+╚██╗██╔╝██║██╔══██╗██╔═══██╗██║     ██║   ██║██╔════╝╚════██╗██╔═████╗
+ ╚███╔╝ ██║███████║██║   ██║██║     ██║   ██║███████╗ █████╔╝██║██╔██║
+ ██╔██╗ ██║██╔══██║██║   ██║██║     ██║   ██║╚════██║██╔═══╝ ████╔╝██║
+██╔╝ ██╗██║██║  ██║╚██████╔╝███████╗╚██████╔╝███████║███████╗╚██████╔╝
+╚═╝  ╚═╝╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝ ╚═════╝ ╚══════╝╚══════╝ ╚═════╝ 
+
+*/
+    }
     let defaultStyle = `@-webkit-keyframes kenburns-top-right {
         0% {
             -webkit-transform: scale(1) translate(0, 0);
@@ -27,6 +39,10 @@
             transform-origin: right top;
         }
     }`;
+    function getMultiLine(f) {
+        const lines = f.toString();
+        return lines.substring(lines.indexOf('/*') + 2, lines.lastIndexOf('*/'));
+    }
     class XiaoLuBG {
         constructor(obj) {
             this._setting = {}
@@ -144,7 +160,7 @@
             }
         }
         init() {
-            console.info('XiaoLu BGImage init...');
+            console.log(getMultiLine(message));
             this._setStyle();
             this._setBgImg();
             this._setBgImgInterval();
