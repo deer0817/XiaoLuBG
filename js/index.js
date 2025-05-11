@@ -73,14 +73,15 @@
             let bgZIndex = this._setting.zIndex || -1;
             let opacity = this._setting.opacity || 1;
             let blur = this._setting.blur || 0;
+            let switchDuration = this._setting.switchDuration || 2;
             let baseStyle = `
-            .${this._className}::before {
+            .${this._className}::before, .${this._className}::after {
                 content: "";
-                position: ${this._setting.position || 'fixed'};
-                top: 0;
                 left: 0;
                 right: 0;
                 bottom: 0;
+                top: 0;
+                position: ${this._setting.position || 'fixed'};
                 width: 100%;
                 height: 100%;
                 z-index: ${bgZIndex};
@@ -88,20 +89,98 @@
                 background-attachment: fixed;
                 background-size: cover;
                 background-repeat: no-repeat;
-                background-image: var(--xiaolu-bg-img);
                 animation: ${animation.enable ? animation.name : 'none'} ${animation.duration}s ease-out infinite alternate both;
                 -webkit-animation: ${animation.enable ? animation.name : 'none'} ${animation.duration}s ease-out infinite alternate both;
                 opacity: ${opacity > 0 ? opacity : 'none'};
-                filter: ${blur > 0 ? `blur(${blur}px)` : 'none'}
+                filter: ${blur > 0 ? `blur(${blur}px)` : 'none'};
+                transition: all ${switchDuration}s cubic-bezier(0.55, 0, 0.1, 1);
+            }
+            .${this._className}.switch-column.show-after::after {
+                top: 0;
+            }
+            .${this._className}.switch-column.show-before::before {
+                top: 0;
+            }
+            .${this._className}.switch-column.show-before::after {
+                opacity: 0;
+                top: -100%;
+                animation: none;
+                -webkit-animation: none;
+            }
+            .${this._className}.switch-column.show-after::before {
+                opacity: 0;
+                top: 100%;
+                animation: none;
+                -webkit-animation: none;
+            }
+            .${this._className}.switch-row.show-after::after {
+                left: 0;
+            }
+            .${this._className}.switch-row.show-before::before {
+                left: 0;
+            }
+            .${this._className}.switch-row.show-before::after {
+                opacity: 0;
+                left: 100%;
+                animation: none;
+                -webkit-animation: none;
+            }
+            .${this._className}.switch-row.show-after::before {
+                opacity: 0;
+                left: -100%;
+                animation: none;
+                -webkit-animation: none;
+            }
+            .${this._className}.switch-corner.show-after::after {
+                left: 0;
+                top: 0;
+            }
+            .${this._className}.switch-corner.show-before::before {
+                left: 0;
+                top: 0;
+            }
+            .${this._className}.switch-corner.show-before::after {
+                opacity: 0;
+                left: 100%;
+                top: 100%;
+                animation: none;
+                -webkit-animation: none;
+            }
+            .${this._className}.switch-corner.show-after::before {
+                opacity: 0;
+                left: -100%;
+                top: -100%;
+                animation: none;
+                -webkit-animation: none;
+            }
+            .${this._className}::before {
+                background-image: var(--xiaolu-bg-img);
+            }
+            .${this._className}::after {
+                background-image: var(--xiaolu-bg-img-after);
             }` 
             baseStyle += defaultStyle;
             let styleNode = document.createElement('style');
             styleNode.innerHTML = baseStyle;
             document.head.appendChild(styleNode);
         }
+        _isShowingBefore() {
+            let selectorNode = this._getSelectorNode();
+            return selectorNode.classList.contains('show-before');
+        }
         _setBg() {
+            let switchDirection = this._setting.switchDirection || 'column';
             let selectorNode = this._getSelectorNode();
             selectorNode.classList.add(this._className);
+            selectorNode.classList.add(`switch-${switchDirection}`);
+            selectorNode.addEventListener('transitionend', (e) => {
+                if (!this._isShowingBefore()) {
+                    selectorNode.style.setProperty('--xiaolu-bg-img', `url(${this._currentImg})`);
+                } else {
+                    let afterImgIndex = (this._imgindex + 1) % this._getImgs().length;
+                    selectorNode.style.setProperty('--xiaolu-bg-img-after', `url(${this._getImgs()[afterImgIndex]})`);
+                }
+            });
         }
         _getBgImg() {
             let imgMode = this._setting.imgMode || 0;
@@ -118,10 +197,37 @@
             }
             return this._currentImg;
         }
+        _setFirstBgImg() {
+            let selectorNode = this._getSelectorNode();
+            let imgs = this._getImgs();
+            if (imgs.length <= 0) {
+                console.error('No images found');
+                return false;
+            }
+            this._getBgImg();
+            selectorNode.style.setProperty('--xiaolu-bg-img', `url(${this._currentImg})`);
+            let afterImgIndex = (this._imgindex + 1) % imgs.length;
+            selectorNode.style.setProperty('--xiaolu-bg-img-after', `url(${imgs[afterImgIndex]})`);
+            selectorNode.classList.add('show-before');
+            return true;
+        }
         _setBgImg() {
             let selectorNode = this._getSelectorNode();
-            let bgImg = this._getBgImg();
-            selectorNode.style.setProperty('--xiaolu-bg-img', `url(${bgImg})`);
+            let curImg = "";
+            if (this._isShowingBefore()) {
+                this._getBgImg();
+                selectorNode.classList.remove('show-before');
+                selectorNode.classList.add('show-after');
+                curImg = selectorNode.style.getPropertyValue('--xiaolu-bg-img-after');
+            } else {
+                selectorNode.classList.remove('show-after');
+                selectorNode.classList.add('show-before');
+                curImg = selectorNode.style.getPropertyValue('--xiaolu-bg-img');
+            }
+            if (curImg.match(/url\(["']?([^"']*)["']?\)/)) {
+                curImg = curImg.match(/url\(["']?([^"']*)["']?\)/)[1];
+            }
+            return curImg;
         }
         _setBgImgInterval() {
             let imgDuration = this._setting.imgDuration || 60;
@@ -129,10 +235,13 @@
             if (imgDuration <= 0) {
                 return;
             }
+            if (this._getImgs().length <= 1) {
+                console.warn('No more than 1 image, no need to set interval');
+                return;
+            }
             setInterval(() => {
-                let bgImg = this._getBgImg();
-                selectorNode.style.setProperty('--xiaolu-bg-img', `url(${bgImg})`);
-                this._dispatchImgChangeEvent();
+                let curImg = this._setBgImg();
+                this._dispatchImgChangeEvent(selectorNode, curImg);
             }, imgDuration * 1000);
         }
         _registerImgChangeHook() {
@@ -142,14 +251,13 @@
                 selectorNode.addEventListener('bgImgChange', imgChangeHook);
             }
         }
-        _dispatchImgChangeEvent() {
-            let selectorNode = this._getSelectorNode();
+        _dispatchImgChangeEvent(selector, imgUrl) {
             let event = new CustomEvent('bgImgChange', {
                 detail: {
-                    img: this._currentImg
+                    img: imgUrl
                 }
             });
-            selectorNode.dispatchEvent(event);
+            selector.dispatchEvent(event);
         }
 
         set(setting) {
@@ -162,9 +270,12 @@
         init() {
             console.log(getMultiLine(message));
             this._setStyle();
-            this._setBgImg();
-            this._setBgImgInterval();
             this._setBg();
+            if (!this._setFirstBgImg()) {
+                console.error('Failed to set first background image');
+                return;
+            }
+            this._setBgImgInterval();
             this._registerImgChangeHook();
         }
     }

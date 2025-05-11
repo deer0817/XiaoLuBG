@@ -20,7 +20,7 @@
         </section>
         <section id="center-content">
             <h2>XiaoLuBG Demo</h2>
-            <div id="background-demo">
+            <div id="background-demo" style="z-index: 1;">
                 <p>呦呦鹿鸣，食野之苹。</p>
             </div>
         </section>
@@ -28,7 +28,7 @@
     <footer>
         <p>&copy; 2025 XiaoLu</p>
     </footer>
-    <script src="https://cdn.jsdelivr.net/gh/deer0817/XiaoLuBG@main/js/index.js"></script>
+    <script src="./js/index.js"></script>
     <script>
         // Example 1
         /*
@@ -60,7 +60,13 @@
         window.$BGIMG.set({
             selector: 'body',
             imgMode: 1, // mode 0: random, mode 1: in-order
-            init: true
+            init: true,
+            imgDuration: 30,
+            switchDuration: 3,
+            switchDirection: "corner", // row, column, corner
+            onBgImgChange: function (event) {
+                console.log("Background for body image changed to: " + event.detail.img);
+            }
         });
         // if init is false
         // window.$BGIMG.init()
@@ -86,7 +92,7 @@
                 name: 'kenburns-bottom-left'
             },
             onBgImgChange: function (event) {
-                console.log("Background image changed to: " + event.detail.img);
+                console.log("Background image for bgDemo changed to: " + event.detail.img);
             }
         });
         bgDemo.init();
