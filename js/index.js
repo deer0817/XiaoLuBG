@@ -174,25 +174,31 @@
             selectorNode.classList.add(this._className);
             selectorNode.classList.add(`switch-${switchDirection}`);
             selectorNode.addEventListener('transitionend', (e) => {
-                if (!this._isShowingBefore()) {
-                    selectorNode.style.setProperty('--xiaolu-bg-img', `url(${this._currentImg})`);
-                } else {
-                    let afterImgIndex = (this._imgindex + 1) % this._getImgs().length;
-                    selectorNode.style.setProperty('--xiaolu-bg-img-after', `url(${this._getImgs()[afterImgIndex]})`);
+                let imgIndex = this._imgindex;
+                let imgs = this._getImgs();
+                let propertyName  = '--xiaolu-bg-img';
+                if (this._isShowingBefore()) {
+                    imgIndex = (imgIndex + 1) % imgs.length;
+                    propertyName = '--xiaolu-bg-img-after';
+                }
+                if (selectorNode.style.getPropertyValue(propertyName) !== `url(${imgs[imgIndex]})`) {
+                    selectorNode.style.setProperty(propertyName, `url(${imgs[imgIndex]})`);
                 }
             });
         }
         _getBgImg() {
             let imgMode = this._setting.imgMode || 0;
             let imgs = this._getImgs();
-            if (imgMode == 0) {
-                this._currentImg = imgs[Math.floor(Math.random() * imgs.length)];
-            } else if (imgMode == 1) {
-                this._imgindex = (this._imgindex + 1) % imgs.length;
+            if (imgMode === 0) {
+                this._imgindex = Math.floor(Math.random() * imgs.length);
+                this._currentImg = imgs[this._imgindex];
+            } else if (imgMode === 1) {
+                this._imgindex = (this._imgindex + 2) % imgs.length;
                 this._currentImg = imgs[this._imgindex];
             } else {
                 console.warn('Unknown imgMode, using random mode');
-                this._currentImg = imgs[Math.floor(Math.random() * imgs.length)];
+                this._imgindex = Math.floor(Math.random() * imgs.length);
+                this._currentImg = imgs[this._imgindex];
             }
             return this._currentImg;
         }
@@ -293,7 +299,7 @@
             "https://cdn.jsdelivr.net/gh/deer0817/XiaoLuBG/imgs/landscape.jpg",
             "https://cdn.jsdelivr.net/gh/deer0817/XiaoLuBG/imgs/moon.jpg"
         ],
-        imgMode: 0,
+        imgMode: 1,
         imgDuration: 60,
         animation: {
             enable: true,
